@@ -1,0 +1,41 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: nodejs-app
+  labels:
+    app: nodejs-app
+spec:
+  selector:
+    matchLabels:
+      app: nodejs-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+      - name: nodejs-app
+        image: kat123/sample-node-app:#{Build.BuildId}#
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 3000
+        name: nodejs-port
+----
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-app
+  labels:
+    app: nodejs-app
+spec:
+  ports:
+  - port: 3030
+    targetPort: nodejs-port
+  selector:
+    app: nodejs-app
+  type: LoadBalancer
